@@ -65,7 +65,8 @@ public class MainView extends VerticalLayout {
         grid.addColumn(Producto::getCategoria).setHeader("Categoría").setAutoWidth(true);
         grid.addColumn(Producto::getPrecio).setHeader("Precio").setAutoWidth(true);
         grid.addColumn(Producto::getStock).setHeader("Stock").setAutoWidth(true);
-
+        grid.addColumn(Producto::getStock).setHeader("Stock").setAutoWidth(true);
+        
         Runnable refrescar = () -> grid.setItems(crudService.listarTodos(Producto.class));
         refrescar.run();
 
