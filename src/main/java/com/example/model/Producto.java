@@ -92,4 +92,12 @@ public class Producto {
     public String toString() {
         return "Producto [id=" + id + ", codigo=" + codigo + ", nombre=" + nombre + ", stock=" + stock + "]";
     }
+
+    public Object getContacto1() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public Object getContacto() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
 }
