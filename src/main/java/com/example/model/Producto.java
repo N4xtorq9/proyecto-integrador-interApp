@@ -11,11 +11,12 @@ import jakarta.persistence.Table;
 public class Producto {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long idProducto;
+    private Long idUsuario;
     private String codigo;
     private String nombre;
     private String categoria;
-    private Double precio;
+    private Double estado;
     private Integer stock;
 
     // ===================
@@ -24,28 +25,44 @@ public class Producto {
     public Producto() {
     }
 
-    public Producto(String codigo, String nombre, String categoria, Double precio, Integer stock) {
-        this(null, codigo, nombre, categoria, precio, stock);
+    public Producto(Long idUsuario, String codigo, String nombre, String categoria, Double estado, Integer stock) {
+        this(null, idUsuario, codigo, nombre, categoria, estado, stock);
     }
 
-    public Producto(Long id, String codigo, String nombre, String categoria, Double precio, Integer stock) {
-        this.id = id;
+    public Producto(Long idProducto, Long idUsuario, String codigo, String nombre, String categoria, Double estado, Integer stock) {
+        this.idProducto = idProducto;
+        this.idUsuario = idUsuario;
         this.codigo = codigo;
         this.nombre = nombre;
         this.categoria = categoria;
-        this.precio = precio;
+        this.estado = estado;
         this.stock = stock;
+    }
+
+    public Producto(Integer int1, String value, String value2, String value3, String value4, String value5,
+            Integer int2) {
+        //TODO Auto-generated constructor stub
     }
 
     // ===================
     // Getters y setters
     // ===================
-    public Long getId() {
-        return id;
+    public Long getidProducto() {
+        return idProducto;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setidProducto(Long idProducto) {
+        this.idProducto = idProducto;
+    }
+
+    
+
+    public Long getidUsuario() {
+        return idUsuario;
+    }
+
+    public void setidUsuario(Long idUsuario) {
+        this.idUsuario = idUsuario;
     }
 
     public String getCodigo() {
@@ -72,12 +89,12 @@ public class Producto {
         this.categoria = categoria;
     }
 
-    public Double getPrecio() {
-        return precio;
+    public Double getestado() {
+        return estado;
     }
 
-    public void setPrecio(Double precio) {
-        this.precio = precio;
+    public void setestado(Double estado) {
+        this.estado = estado;
     }
 
     public Integer getStock() {
@@ -90,6 +107,9 @@ public class Producto {
 
     @Override
     public String toString() {
-        return "Producto [id=" + id + ", codigo=" + codigo + ", nombre=" + nombre + ", stock=" + stock + "]";
+        return "Producto [idProducto=" + idProducto + ", idUsuario=" + idUsuario + ", codigo=" + codigo + ", nombre="
+                + nombre + ", categoria=" + categoria + ", estado=" + estado + ", stock=" + stock + "]";
     }
+
+    
 }
