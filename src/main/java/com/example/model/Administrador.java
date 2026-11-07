@@ -10,45 +10,53 @@ import jakarta.persistence.Table;
 // Las clases siempre van en singular
 // @table siempre va en plural
 @Entity
-@Table(name = "proveedores")
-public class Proveedor {
+@Table(name = "Administradores")
+public class Administrador  {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long idAdministrador;
     private String nombre;
     private String contacto;
     private String telefono;
     private String email;
     private String direccion;
+    private String rol;
+    private String estado;
+    private String fecharegistro;
+    private String clave;
 
     // ===================
     // Constructores
     // ===================
-    public Proveedor() {
+    public Administrador() {
     }
 
-    public Proveedor(String nombre, String contacto, String telefono, String email, String direccion) {
+    public Administrador(String nombre, String contacto, String telefono, String email, String direccion) {
         this(null, nombre, contacto, telefono, email, direccion);
     }
 
-    public Proveedor(Long id, String nombre, String contacto, String telefono, String email, String direccion) {
-        this.id = id;
+    public Administrador(Long idAdministrador, String nombre, String contacto, String telefono, String email, String direccion) {
+        this.idAdministrador = idAdministrador;
         this.nombre = nombre;
         this.contacto = contacto;
         this.telefono = telefono;
         this.email = email;
         this.direccion = direccion;
+        this.rol = rol;
+        this.estado = estado;
+        this.fecharegistro = fecharegistro;
+        this.clave = clave;
     }
 
     // ===================
     // Getters y setters
     // ===================
-    public Long getId() {
-        return id;
+    public Long getIdAdministrador() {
+        return idAdministrador;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public void setIdAdministrador(Long idAdministrador) {
+        this.idAdministrador = idAdministrador;
     }
 
     public String getNombre() {
@@ -90,9 +98,36 @@ public class Proveedor {
     public void setDireccion(String direccion) {
         this.direccion = direccion;
     }
+    public String getRol() {
+        return rol;
+    }
+
+    public String getEstado() {
+        return estado;
+    }
+
+    public String getFecharegistro() {
+        return fecharegistro;
+    }
+
+    public String getClave() {
+        return clave;
+    }
+    public void setRol(String rol) {
+        this.rol = rol;
+    }
+    public void setEstado(String estado) {
+        this.estado = estado;
+    }
+    public void setFecharegistro(String fecharegistro) {
+        this.fecharegistro = fecharegistro;
+    }
+    public void setClave(String clave) {
+        this.clave = clave;
+    }
 
     @Override
     public String toString() {
-        return "Proveedor [id=" + id + ", nombre=" + nombre + ", contacto=" + contacto + "]";
+        return "Administrador [idAdministrador=" + idAdministrador + ", nombre=" + nombre + ", contacto=" + contacto + "]";
     }
 }
