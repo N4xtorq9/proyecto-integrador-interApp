@@ -16,7 +16,7 @@ public class Producto {
     private String codigo;
     private String nombre;
     private String categoria;
-    private Double estado;
+    private String estado;
     private Integer stock;
 
     // ===================
@@ -25,11 +25,11 @@ public class Producto {
     public Producto() {
     }
 
-    public Producto(Long idUsuario, String codigo, String nombre, String categoria, Double estado, Integer stock) {
+    public Producto(Long idUsuario, String codigo, String nombre, String categoria, String estado, Integer stock) {
         this(null, idUsuario, codigo, nombre, categoria, estado, stock);
     }
 
-    public Producto(Long idProducto, Long idUsuario, String codigo, String nombre, String categoria, Double estado, Integer stock) {
+    public Producto(Long idProducto, Long idUsuario, String codigo, String nombre, String categoria, String estado, Integer stock) {
         this.idProducto = idProducto;
         this.idUsuario = idUsuario;
         this.codigo = codigo;
@@ -37,11 +37,6 @@ public class Producto {
         this.categoria = categoria;
         this.estado = estado;
         this.stock = stock;
-    }
-
-    public Producto(Integer int1, String value, String value2, String value3, String value4, String value5,
-            Integer int2) {
-        //TODO Auto-generated constructor stub
     }
 
     // ===================
@@ -89,11 +84,11 @@ public class Producto {
         this.categoria = categoria;
     }
 
-    public Double getestado() {
+    public String getestado() {
         return estado;
     }
 
-    public void setestado(Double estado) {
+    public void setestado(String estado) {
         this.estado = estado;
     }
 

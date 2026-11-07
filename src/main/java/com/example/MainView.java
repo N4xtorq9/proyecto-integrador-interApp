@@ -1,6 +1,11 @@
 package com.example;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.function.Function;
 
 import com.example.model.Categoria;
 import com.example.model.Administrador;
@@ -9,11 +14,14 @@ import com.example.model.Producto;
 import com.example.model.Proveedor;
 import com.example.model.Usuario;
 import com.example.service.CrudService;
+import com.example.service.ExportService;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.AttachmentType;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -22,16 +30,23 @@ import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.DownloadResponse;
 
 @PageTitle("Gestión CRUD - InterApp")
 @Route("")
 public class MainView extends VerticalLayout {
 
 
-    private final CrudService crudService;
+    private static final String TIPO_PDF = "application/pdf";
+    private static final String TIPO_EXCEL = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
-    public MainView(CrudService crudService) {
+    private final CrudService crudService;
+    private final ExportService exportService;
+
+    public MainView(CrudService crudService, ExportService exportService) {
         this.crudService = crudService;
+        this.exportService = exportService;
         setSizeFull();
         setPadding(true);
         setSpacing(true);
@@ -71,7 +86,6 @@ public class MainView extends VerticalLayout {
         grid.addColumn(Producto::getCategoria).setHeader("Categoría").setAutoWidth(true);
         grid.addColumn(Producto::getestado).setHeader("estado").setAutoWidth(true);
         grid.addColumn(Producto::getStock).setHeader("Stock").setAutoWidth(true);
-        grid.addColumn(Producto::getStock).setHeader("Stock").setAutoWidth(true);
         
         Runnable refrescar = () -> grid.setItems(crudService.listarTodos(Producto.class));
         refrescar.run();
@@ -86,15 +100,14 @@ public class MainView extends VerticalLayout {
                 codigoField.setValue(p.getCodigo() != null ? p.getCodigo() : "");
                 nombreField.setValue(p.getNombre() != null ? p.getNombre() : "");
                 categoriaField.setValue(p.getCategoria() != null ? p.getCategoria() : "");
-                estadoField.setValue(p.getestado() != null ? p.getestado().toString() : "");
+                estadoField.setValue(p.getestado() != null ? p.getestado() : "");
                 stockField.setValue(p.getStock() != null ? p.getStock().toString() : "");
             }
         });
 
         Button btnCrear = new Button("Crear", e -> {
             Producto p = new Producto(
-                parseInt(idProductoField.getValue()),
-                idUsuarioField.getValue(),
+                parseId(idUsuarioField),
                 codigoField.getValue(),
                 nombreField.getValue(),
                 categoriaField.getValue(),
@@ -124,7 +137,7 @@ public class MainView extends VerticalLayout {
                 p.setCodigo(codigoField.getValue());
                 p.setNombre(nombreField.getValue());
                 p.setCategoria(categoriaField.getValue());
-                p.setestado(parseDouble(estadoField.getValue()));
+                p.setestado(estadoField.getValue());
                 p.setStock(parseInt(stockField.getValue()));
                 crudService.actualizar(p);
                 refrescar.run();
@@ -147,7 +160,11 @@ public class MainView extends VerticalLayout {
             grid.asSingleSelect().clear();
         });
 
-        layout.add(form, crearAcciones(btnCrear, btnConsultar, btnActualizar, btnEliminar, btnLimpiar), grid);
+        layout.add(form, crearAcciones(btnCrear, btnConsultar, btnActualizar, btnEliminar, btnLimpiar,
+            crearDescargas("Productos", "productos", Producto.class,
+                List.of("Id Producto", "Id Usuario", "Código", "Nombre", "Categoría", "estado", "Stock"),
+                p -> new Object[] {p.getidProducto(), p.getidUsuario(), p.getCodigo(), p.getNombre(),
+                    p.getCategoria(), p.getestado(), p.getStock()})), grid);
         return layout;
     }
 
@@ -268,7 +285,11 @@ public class MainView extends VerticalLayout {
             grid.asSingleSelect().clear();
         });
 
-        layout.add(form, crearAcciones(btnCrear, btnConsultar, btnActualizar, btnEliminar, btnLimpiar), grid);
+        layout.add(form, crearAcciones(btnCrear, btnConsultar, btnActualizar, btnEliminar, btnLimpiar,
+            crearDescargas("Administradores", "administradores", Administrador.class,
+                List.of("ID", "Nombre", "Contacto", "Teléfono", "Email", "Dirección", "Rol", "Estado", "Fecha registro"),
+                a -> new Object[] {a.getIdAdministrador(), a.getNombre(), a.getContacto(), a.getTelefono(), a.getEmail(),
+                    a.getDireccion(), a.getRol(), a.getEstado(), a.getFecharegistro()})), grid);
         return layout;
     }
 
@@ -364,7 +385,10 @@ public class MainView extends VerticalLayout {
             grid.asSingleSelect().clear();
         });
 
-        layout.add(form, crearAcciones(btnCrear, btnConsultar, btnActualizar, btnEliminar, btnLimpiar), grid);
+        layout.add(form, crearAcciones(btnCrear, btnConsultar, btnActualizar, btnEliminar, btnLimpiar,
+            crearDescargas("Intercambios", "intercambios", intercambio.class,
+                List.of("ID", "Nombre", "Contacto", "Teléfono", "Email", "Dirección"),
+                p -> new Object[] {p.getId(), p.getNombre(), p.getContacto(), p.getTelefono(), p.getEmail(), p.getDireccion()})), grid);
         return layout;
     }
 
@@ -442,7 +466,10 @@ public class MainView extends VerticalLayout {
             grid.asSingleSelect().clear();
         });
 
-        layout.add(form, crearAcciones(btnCrear, btnConsultar, btnActualizar, btnEliminar, btnLimpiar), grid);
+        layout.add(form, crearAcciones(btnCrear, btnConsultar, btnActualizar, btnEliminar, btnLimpiar,
+            crearDescargas("Categorías", "categorias", Categoria.class,
+                List.of("ID", "Nombre", "Descripción"),
+                c -> new Object[] {c.getId(), c.getNombre(), c.getDescripcion()})), grid);
         return layout;
     }
 
@@ -537,7 +564,10 @@ public class MainView extends VerticalLayout {
             grid.asSingleSelect().clear();
         });
 
-        layout.add(form, crearAcciones(btnCrear, btnConsultar, btnActualizar, btnEliminar, btnLimpiar), grid);
+        layout.add(form, crearAcciones(btnCrear, btnConsultar, btnActualizar, btnEliminar, btnLimpiar,
+            crearDescargas("Proveedores", "proveedores", Proveedor.class,
+                List.of("ID", "Nombre", "Contacto", "Teléfono", "Email", "Dirección"),
+                p -> new Object[] {p.getId(), p.getNombre(), p.getContacto(), p.getTelefono(), p.getEmail(), p.getDireccion()})), grid);
         return layout;
     }
 
@@ -642,7 +672,10 @@ public class MainView extends VerticalLayout {
             grid.asSingleSelect().clear();
         });
 
-        layout.add(form, crearAcciones(btnCrear, btnConsultar, btnActualizar, btnEliminar, btnLimpiar), grid);
+        layout.add(form, crearAcciones(btnCrear, btnConsultar, btnActualizar, btnEliminar, btnLimpiar,
+            crearDescargas("Usuarios", "usuarios", Usuario.class,
+                List.of("ID", "Nombre", "Apellido", "Email", "Teléfono", "Rol", "Estado"),
+                u -> new Object[] {u.getId(), u.getNombre(), u.getApellido(), u.getEmail(), u.getTelefono(), u.getRol(), u.getEstado()})), grid);
         return layout;
     }
 
@@ -654,14 +687,6 @@ public class MainView extends VerticalLayout {
             return Long.parseLong(field.getValue().trim());
         } catch (Exception e) {
             return null;
-        }
-    }
-
-    private Double parseDouble(String val) {
-        try {
-            return Double.parseDouble(val.trim());
-        } catch (Exception e) {
-            return 0.0;
         }
     }
 
@@ -679,9 +704,41 @@ public class MainView extends VerticalLayout {
         }
     }
 
-    private HorizontalLayout crearAcciones(Button... botones) {
-        HorizontalLayout layout = new HorizontalLayout(botones);
+    private HorizontalLayout crearAcciones(Component... acciones) {
+        HorizontalLayout layout = new HorizontalLayout(acciones);
         layout.getStyle().set("flex-wrap", "wrap");
         return layout;
+    }
+
+    /**
+     * Crea los botones de descarga de una sección. Los datos se consultan al
+     * momento de descargar, para que el archivo siempre esté actualizado.
+     */
+    private <T> Component crearDescargas(String titulo, String nombreArchivo, Class<T> clase,
+            List<String> encabezados, Function<T, Object[]> fila) {
+        Anchor pdf = crearEnlaceDescarga("Descargar PDF", nombreArchivo + ".pdf", TIPO_PDF,
+            () -> exportService.generarPdf(titulo, encabezados, obtenerFilas(clase, fila)));
+        Anchor excel = crearEnlaceDescarga("Descargar Excel", nombreArchivo + ".xlsx", TIPO_EXCEL,
+            () -> exportService.generarExcel(titulo, encabezados, obtenerFilas(clase, fila)));
+        return crearAcciones(pdf, excel);
+    }
+
+    private <T> List<Object[]> obtenerFilas(Class<T> clase, Function<T, Object[]> fila) {
+        return crudService.listarTodos(clase).stream().map(fila).toList();
+    }
+
+    private Anchor crearEnlaceDescarga(String texto, String nombreArchivo, String tipo, GeneradorArchivo generador) {
+        Anchor enlace = new Anchor();
+        enlace.setHref(DownloadHandler.fromInputStream(evento -> {
+            byte[] contenido = generador.generar();
+            return new DownloadResponse(new ByteArrayInputStream(contenido), nombreArchivo, tipo, contenido.length);
+        }), AttachmentType.DOWNLOAD);
+        enlace.add(new Button(texto));
+        return enlace;
+    }
+
+    @FunctionalInterface
+    private interface GeneradorArchivo extends Serializable {
+        byte[] generar() throws IOException;
     }
 }

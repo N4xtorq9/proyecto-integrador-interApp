@@ -10,6 +10,8 @@
     <properties>
         <java.version>25</java.version>
         <vaadin.version>25.3.0</vaadin.version>
+        <poi.version>5.5.1</poi.version>
+        <openpdf.version>3.0.5</openpdf.version>
     </properties>
     
     <parent>
@@ -54,6 +56,18 @@
             <groupId>org.postgresql</groupId>
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
+        </dependency>
+        <!-- Generación de archivos Excel (.xlsx) -->
+        <dependency>
+            <groupId>org.apache.poi</groupId>
+            <artifactId>poi-ooxml</artifactId>
+            <version>${poi.version}</version>
+        </dependency>
+        <!-- Generación de archivos PDF -->
+        <dependency>
+            <groupId>com.github.librepdf</groupId>
+            <artifactId>openpdf</artifactId>
+            <version>${openpdf.version}</version>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
