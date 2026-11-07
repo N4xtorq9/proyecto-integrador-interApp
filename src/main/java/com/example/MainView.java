@@ -158,9 +158,9 @@ public class MainView extends VerticalLayout {
         FormLayout form = new FormLayout(idField, nombreField, descripcionField);
 
         Grid<Categoria> grid = new Grid<>(Categoria.class, false);
-        grid.addColumn(Categoria::getId).setHeader("ID").setAutoWidth(true);
-        grid.addColumn(Categoria::getNombre).setHeader("Nombre").setAutoWidth(true);
-        grid.addColumn(Categoria::getDescripcion).setHeader("Descripción").setAutoWidth(true);
+        grid.addColumn((Categoria categoria) -> categoria.getId()).setHeader("ID").setAutoWidth(true);
+        grid.addColumn((Categoria categoria) -> categoria.getNombre()).setHeader("Nombre").setAutoWidth(true);
+        grid.addColumn((Categoria categoria) -> categoria.getDescripcion()).setHeader("Descripción").setAutoWidth(true);
 
         Runnable refrescar = () -> grid.setItems(crudService.listarTodos(Categoria.class));
         refrescar.run();
